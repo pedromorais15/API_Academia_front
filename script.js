@@ -143,7 +143,7 @@ alunoForm.addEventListener('submit', async (e) => {
         if (resposta.ok) {
             limparFormulario();
             carregarAlunos();
-            if(id) alert("Cadastro do Atleta PRO atualizado com sucesso!");
+            if(id) alert("Cadastro do aluno atualizado com sucesso!");
         } else {
             const erro = await resposta.json();
             alert("Falha ao salvar: " + erro.error);
@@ -167,7 +167,7 @@ function prepararEdicao(id) {
 }
 
 async function deletarAluno(id) {
-    if (!confirm("Confirmar exclusão definitiva do cadastro deste Atleta PRO?")) return;
+    if (!confirm("Confirmar exclusão definitiva do cadastro deste aluno?")) return;
     try {
         const res = await fetch(`${API_BASE_URL}/alunos/${id}`, {
             method: 'DELETE',
