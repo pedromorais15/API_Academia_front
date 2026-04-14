@@ -1,7 +1,5 @@
-// URL da sua API na Vercel
 const API_BASE_URL = 'https://api-academia-five.vercel.app'; 
 
-// Referências
 const loginSection = document.getElementById('loginSection');
 const adminSection = document.getElementById('adminSection');
 const loginForm = document.getElementById('loginForm');
@@ -18,7 +16,6 @@ const formTitle = document.getElementById('formTitle');
 let tokenAtual = localStorage.getItem('gymToken') || null;
 let alunos = [];
 
-// Início
 function iniciarApp() {
     if (tokenAtual) {
         mostrarPainelAdmin();
@@ -50,36 +47,30 @@ loginForm.addEventListener('submit', async (e) => {
             mostrarPainelAdmin();
             carregarAlunos();
         } else {
-            loginError.textContent = dados.error || "Erro ao logar";
             loginError.classList.remove('hidden');
+            setTimeout(() => loginError.classList.add('hidden'), 3000);
         }
     } catch (erro) {
-        alert("Erro de conexão com a API.");
+        alert("Erro de conexão com o servidor.");
     }
 });
 
-// LOGOUT
 btnLogout.addEventListener('click', () => {
     tokenAtual = null;
     localStorage.removeItem('gymToken');
     mostrarLogin();
 });
 
-// LISTAR ALUNOS (GET)
+// GET ALUNOS
 async function carregarAlunos() {
     try {
-        const resposta = await fetch(`${API_BASE_URL}/alunos`, {
-            method: 'GET'
-            // O GET de alunos no seu Python não tem @token_obrigatorio, 
-            // então não precisa de Header de Authorization aqui.
-        });
-
+        const resposta = await fetch(`${API_BASE_URL}/alunos`);
         if (resposta.ok) {
             alunos = await resposta.json();
             renderizarTabela();
         }
     } catch (erro) {
-        console.error("Erro ao buscar alunos:", erro);
+        console.error(erro);
     }
 }
 
@@ -89,26 +80,38 @@ function renderizarTabela() {
 
     alunos.forEach(aluno => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition-colors";
+        tr.className = "hover:bg-slate-800/50 transition-colors border-l-2 border-transparent hover:border-blue-500";
+        
+        // Estilo dinâmico para os status
+        let statusClass = "bg-slate-700 text-slate-300";
+        if(aluno.status === 'Ativo') statusClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+        if(aluno.status === 'Inativo') statusClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+
         tr.innerHTML = `
-            <td class="px-6 py-4 font-bold text-slate-700">${aluno.nome}</td>
-            <td class="px-6 py-4 text-slate-500">${aluno.cpf}</td>
             <td class="px-6 py-4">
-                <span class="px-2 py-1 rounded text-[10px] font-black uppercase ${
-                    aluno.status === 'Ativo' ? 'bg-green-100 text-green-700' : 
-                    aluno.status === 'Inativo' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
-                }">${aluno.status}</span>
+                <div class="font-bold text-white">${aluno.nome}</div>
+                <div class="text-[10px] text-slate-500 uppercase tracking-tighter">Matrícula: #${aluno.id}</div>
             </td>
-            <td class="px-6 py-4 text-right space-x-2">
-                <button onclick="prepararEdicao('${aluno.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
-                <button onclick="deletarAluno('${aluno.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+            <td class="px-6 py-4 text-slate-400 font-mono">${aluno.cpf}</td>
+            <td class="px-6 py-4">
+                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${statusClass}">
+                    ${aluno.status}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+                <button onclick="prepararEdicao('${aluno.id}')" class="p-2 text-slate-400 hover:text-blue-400 transition-colors">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deletarAluno('${aluno.id}')" class="p-2 text-slate-400 hover:text-red-400 transition-colors ml-2">
+                    <i class="fas fa-trash"></i>
+                </button>
             </td>
         `;
         tabelaAlunos.appendChild(tr);
     });
 }
 
-// SALVAR (POST OU PATCH)
+// SALVAR (POST / PATCH)
 alunoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('alunoId').value;
@@ -119,8 +122,6 @@ alunoForm.addEventListener('submit', async (e) => {
     };
 
     try {
-        // Se tem ID, usa PATCH (seu backend aceita PATCH para tudo)
-        // Se não tem ID, usa POST
         const url = id ? `${API_BASE_URL}/alunos/${id}` : `${API_BASE_URL}/alunos`;
         const metodo = id ? 'PATCH' : 'POST';
 
@@ -136,7 +137,6 @@ alunoForm.addEventListener('submit', async (e) => {
         if (resposta.ok) {
             limparFormulario();
             carregarAlunos();
-            if(id) alert("Aluno atualizado!");
         } else {
             const erro = await resposta.json();
             alert("Erro: " + erro.error);
@@ -146,7 +146,6 @@ alunoForm.addEventListener('submit', async (e) => {
     }
 });
 
-// AUXILIARES
 function prepararEdicao(id) {
     const aluno = alunos.find(a => String(a.id) === String(id));
     if (aluno) {
@@ -154,14 +153,14 @@ function prepararEdicao(id) {
         document.getElementById('nome').value = aluno.nome;
         document.getElementById('cpf').value = aluno.cpf;
         document.getElementById('status').value = aluno.status;
-        formTitle.innerHTML = `<i class="fas fa-edit text-yellow-500"></i> Editando Aluno`;
+        formTitle.innerHTML = `<span class="w-2 h-8 bg-yellow-500 rounded-full"></span> EDITAR ALUNO`;
         btnCancelar.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
 async function deletarAluno(id) {
-    if (!confirm("Deseja realmente excluir este aluno?")) return;
+    if (!confirm("Confirmar exclusão definitiva?")) return;
     try {
         const res = await fetch(`${API_BASE_URL}/alunos/${id}`, {
             method: 'DELETE',
@@ -174,7 +173,7 @@ async function deletarAluno(id) {
 function limparFormulario() {
     alunoForm.reset();
     document.getElementById('alunoId').value = '';
-    formTitle.innerHTML = `<i class="fas fa-user-plus text-yellow-500"></i> Novo Aluno`;
+    formTitle.innerHTML = `<span class="w-2 h-8 bg-blue-500 rounded-full"></span> NOVO CADASTRO`;
     btnCancelar.classList.add('hidden');
 }
 
