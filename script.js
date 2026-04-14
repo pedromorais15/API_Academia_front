@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://api-academia-five.vercel.app'; 
+const API_BASE_URL = 'https://api-academia-five.vercel.app/'; 
 
 const loginSection = document.getElementById('loginSection');
 const adminSection = document.getElementById('adminSection');
@@ -12,17 +12,51 @@ const tabelaAlunos = document.getElementById('tabelaAlunos');
 const totalAlunosEl = document.getElementById('totalAlunos');
 const btnCancelar = document.getElementById('btnCancelar');
 const formTitle = document.getElementById('formTitle');
+const cpfInput = document.getElementById('cpf');
 
-let tokenAtual = localStorage.getItem('gymToken') || null;
+let tokenAtual = null; // Começa sempre como null para mostrar login primeiro
 let alunos = [];
 
-function iniciarApp() {
-    if (tokenAtual) {
-        mostrarPainelAdmin();
-        carregarAlunos();
-    } else {
-        mostrarLogin();
+// ==================== FUNÇÃO PARA LIMITAR E FORMATAR CPF ====================
+function formatarCPF(valor) {
+    // Remove tudo que não é número
+    let cpf = valor.replace(/\D/g, '');
+    
+    // Limita a 11 dígitos
+    if (cpf.length > 11) {
+        cpf = cpf.slice(0, 11);
     }
+    
+    // Aplica máscara
+    if (cpf.length <= 3) {
+        return cpf;
+    } else if (cpf.length <= 6) {
+        return cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    } else if (cpf.length <= 9) {
+        return cpf.replace(/(\d{3})(\d{3})(\d)/, '$1.$2.$3');
+    } else {
+        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d)/, '$1.$2.$3-$4');
+    }
+}
+
+function limitarCPF(event) {
+    let valor = event.target.value;
+    valor = formatarCPF(valor);
+    event.target.value = valor;
+}
+
+// Adiciona evento de limitação de CPF
+if (cpfInput) {
+    cpfInput.addEventListener('input', limitarCPF);
+}
+
+function iniciarApp() {
+    // SEMPRE mostra a tela de login primeiro
+    mostrarLogin();
+    
+    // Limpa qualquer token antigo
+    localStorage.removeItem('gymToken');
+    tokenAtual = null;
 }
 
 // LOGIN
@@ -30,6 +64,12 @@ loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const usuario = document.getElementById('usuario').value;
     const senha = document.getElementById('password').value;
+
+    // Desabilita o botão durante o login
+    const btnSubmit = loginForm.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.textContent;
+    btnSubmit.textContent = '⏳ VERIFICANDO...';
+    btnSubmit.disabled = true;
 
     try {
         const resposta = await fetch(`${API_BASE_URL}/login`, {
@@ -44,14 +84,26 @@ loginForm.addEventListener('submit', async (e) => {
             tokenAtual = dados.token;
             localStorage.setItem('gymToken', tokenAtual);
             loginForm.reset();
+            // Limpa explicitamente os campos de senha
+            document.getElementById('password').value = '';
+            document.getElementById('usuario').value = '';
             mostrarPainelAdmin();
             carregarAlunos();
         } else {
             loginError.classList.remove('hidden');
             setTimeout(() => loginError.classList.add('hidden'), 4000);
+            // Limpa apenas o campo senha em caso de erro
+            document.getElementById('password').value = '';
         }
     } catch (erro) {
-        alert("Erro de conexão com a API.");
+        loginError.textContent = "Erro de conexão com a API!";
+        loginError.classList.remove('hidden');
+        setTimeout(() => loginError.classList.add('hidden'), 4000);
+        document.getElementById('password').value = '';
+    } finally {
+        // Reabilita o botão
+        btnSubmit.textContent = textoOriginal;
+        btnSubmit.disabled = false;
     }
 });
 
@@ -59,10 +111,17 @@ btnLogout.addEventListener('click', () => {
     tokenAtual = null;
     localStorage.removeItem('gymToken');
     mostrarLogin();
+    // Limpa os campos de login
+    document.getElementById('usuario').value = '';
+    document.getElementById('password').value = '';
+    // Limpa o formulário de aluno também
+    limparFormulario();
 });
 
 // GET ALUNOS
 async function carregarAlunos() {
+    if (!tokenAtual) return;
+    
     try {
         const resposta = await fetch(`${API_BASE_URL}/alunos`);
         if (resposta.ok) {
@@ -78,37 +137,29 @@ function renderizarTabela() {
     tabelaAlunos.innerHTML = '';
     totalAlunosEl.textContent = alunos.length;
 
-    // Ordenar alunos por ID de forma decrescente para os novos aparecerem em cima
     alunos.sort((a, b) => b.id - a.id);
 
     alunos.forEach(aluno => {
         const tr = document.createElement('tr');
-        // Efeito de hover com borda Neon Blue
-        tr.className = "hover:bg-slate-800/60 transition-colors border-l-4 border-transparent hover:border-blue-500 cursor-default";
         
-        // Estilo dinâmico para os status no Dark Mode
-        let statusClass = "bg-slate-700 text-slate-300";
-        // Estilo Neon Blue suave para "Ativo"
-        if(aluno.status === 'Ativo') statusClass = "bg-blue-500/15 text-blue-400 border border-blue-500/30 font-bold";
-        if(aluno.status === 'Inativo') statusClass = "bg-red-500/10 text-red-400 border border-red-500/20";
-        if(aluno.status === 'Pendente') statusClass = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
+        let statusClass = "";
+        if(aluno.status === 'Ativo') statusClass = "status-ativo";
+        if(aluno.status === 'Inativo') statusClass = "status-inativo";
 
         tr.innerHTML = `
-            <td class="px-8 py-5">
-                <div class="font-black text-white text-base">${aluno.nome}</div>
-                <div class="text-[11px] text-blue-400 uppercase font-black tracking-widest mt-0.5">Atleta PRO ID: #${aluno.id}</div>
+            <td style="padding: 1rem 1.5rem;">
+                <div style="font-weight: 900; color: var(--cinza-claro); font-size: 1rem;">${aluno.nome}</div>
+                <div style="font-size: 0.7rem; color: var(--cinza-medio); letter-spacing: 1px; margin-top: 4px;">Atleta PRO ID: #${aluno.id}</div>
             </td>
-            <td class="px-8 py-5 text-slate-400 font-mono text-sm">${aluno.cpf}</td>
-            <td class="px-8 py-5">
-                <span class="px-4 py-1.5 rounded-full text-xs uppercase font-black ${statusClass}">
-                    ${aluno.status}
-                </span>
+            <td style="padding: 1rem 1.5rem; color: var(--cinza-medio); font-family: monospace;">${aluno.cpf}</td>
+            <td style="padding: 1rem 1.5rem;">
+                <span class="status-badge ${statusClass}">${aluno.status}</span>
             </td>
-            <td class="px-8 py-5 text-right">
-                <button onclick="prepararEdicao('${aluno.id}')" class="p-3 text-slate-400 hover:text-blue-500 transition-colors bg-[#0f172a] rounded-lg border border-slate-700 hover:border-blue-500 ml-3">
+            <td style="padding: 1rem 1.5rem; text-align: right;">
+                <button onclick="prepararEdicao('${aluno.id}')" class="btn-edit">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button onclick="deletarAluno('${aluno.id}')" class="p-3 text-slate-400 hover:text-red-400 transition-colors ml-2 bg-[#0f172a] rounded-lg border border-slate-700 hover:border-red-400">
+                <button onclick="deletarAluno('${aluno.id}')" class="btn-delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -120,12 +171,32 @@ function renderizarTabela() {
 // SALVAR (POST / PATCH)
 alunoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    if (!tokenAtual) {
+        alert("Sessão expirada! Faça login novamente.");
+        mostrarLogin();
+        return;
+    }
+    
+    // Valida CPF antes de enviar
+    const cpfSemMascara = document.getElementById('cpf').value.replace(/\D/g, '');
+    if (cpfSemMascara.length !== 11) {
+        alert("CPF deve conter 11 dígitos!");
+        return;
+    }
+    
     const id = document.getElementById('alunoId').value;
     const alunoData = {
         nome: document.getElementById('nome').value,
-        cpf: document.getElementById('cpf').value,
+        cpf: cpfSemMascara,
         status: document.getElementById('status').value
     };
+
+    // Desabilita botão durante salvamento
+    const btnSave = alunoForm.querySelector('.btn-save');
+    const textoOriginal = btnSave.textContent;
+    btnSave.textContent = '⏳ SALVANDO...';
+    btnSave.disabled = true;
 
     try {
         const url = id ? `${API_BASE_URL}/alunos/${id}` : `${API_BASE_URL}/alunos`;
@@ -143,13 +214,21 @@ alunoForm.addEventListener('submit', async (e) => {
         if (resposta.ok) {
             limparFormulario();
             carregarAlunos();
-            if(id) alert("Cadastro do aluno atualizado com sucesso!");
+            alert(id ? "Cadastro atualizado com sucesso!" : "Cadastro realizado com sucesso!");
         } else {
             const erro = await resposta.json();
             alert("Falha ao salvar: " + erro.error);
+            if (resposta.status === 401) {
+                // Token expirado
+                mostrarLogin();
+            }
         }
     } catch (err) {
         console.error(err);
+        alert("Erro de conexão ao tentar salvar");
+    } finally {
+        btnSave.textContent = textoOriginal;
+        btnSave.disabled = false;
     }
 });
 
@@ -158,29 +237,46 @@ function prepararEdicao(id) {
     if (aluno) {
         document.getElementById('alunoId').value = aluno.id;
         document.getElementById('nome').value = aluno.nome;
-        document.getElementById('cpf').value = aluno.cpf;
+        // Aplica máscara ao CPF ao editar
+        document.getElementById('cpf').value = formatarCPF(aluno.cpf);
         document.getElementById('status').value = aluno.status;
-        formTitle.innerHTML = `<i class="fas fa-edit text-blue-500"></i> ATUALIZAR CADASTRO`;
+        formTitle.innerHTML = '✏️ ATUALIZAR CADASTRO';
         btnCancelar.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
 async function deletarAluno(id) {
+    if (!tokenAtual) {
+        alert("Sessão expirada! Faça login novamente.");
+        mostrarLogin();
+        return;
+    }
+    
     if (!confirm("Confirmar exclusão definitiva do cadastro deste aluno?")) return;
     try {
         const res = await fetch(`${API_BASE_URL}/alunos/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${tokenAtual}` }
         });
-        if (res.ok) carregarAlunos();
-    } catch (err) { alert("Erro de conexão ao tentar deletar"); }
+        if (res.ok) {
+            carregarAlunos();
+            alert("Aluno removido com sucesso!");
+        } else if (res.status === 401) {
+            mostrarLogin();
+        } else {
+            alert("Erro ao remover aluno");
+        }
+    } catch (err) { 
+        alert("Erro de conexão ao tentar deletar"); 
+    }
 }
 
 function limparFormulario() {
     alunoForm.reset();
     document.getElementById('alunoId').value = '';
-    formTitle.innerHTML = `<i class="fas fa-plus text-blue-500"></i> NOVO CADASTRO`;
+    document.getElementById('cpf').value = '';
+    formTitle.innerHTML = '+ NOVO CADASTRO';
     btnCancelar.classList.add('hidden');
 }
 
@@ -188,6 +284,11 @@ function mostrarLogin() {
     loginSection.classList.remove('hidden');
     adminSection.classList.add('hidden');
     userInfo.classList.add('hidden');
+    // Garante que os campos estejam limpos
+    const usuarioInput = document.getElementById('usuario');
+    const senhaInput = document.getElementById('password');
+    if (usuarioInput) usuarioInput.value = '';
+    if (senhaInput) senhaInput.value = '';
 }
 
 function mostrarPainelAdmin() {
@@ -196,4 +297,5 @@ function mostrarPainelAdmin() {
     userInfo.classList.remove('hidden');
 }
 
+// Inicializar aplicação - SEMPRE mostra login primeiro
 iniciarApp();
