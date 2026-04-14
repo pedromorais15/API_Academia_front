@@ -3,127 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerGym Admin - DarkMode BlueNeon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>PowerGym Admin - Blue Neon Pro</title>
+    <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Personalização do scrollbar para o modo escuro */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; } /* Azul Neon */
-    </style>
 </head>
-<body class="bg-[#0f172a] min-h-screen text-slate-200">
+<body>
 
-    <nav class="bg-[#1e293b] border-b border-blue-500/30 shadow-lg shadow-blue-500/10 h-16 flex items-center">
-        <div class="max-w-7xl mx-auto px-4 w-full flex justify-between items-center h-full">
-            <div class="flex items-center h-full">
-                <div class="bg-[#0f172a] p-3 rounded-lg border border-blue-500 flex items-center justify-center">
-                    <i class="fas fa-dumbbell text-blue-500 text-xl"></i>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo-area">
+                <div class="logo-box">
+                    <i class="fas fa-dumbbell"></i>
                 </div>
-                <span class="font-black text-xl tracking-tighter ml-3 text-white">POWER<span class="text-blue-500">GYM</span> PRO</span>
+                <span class="logo-text">BLACK<span class="neon-blue">IRON</span> GYM</span>
             </div>
-            <div id="userInfo" class="hidden flex items-center gap-6">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">ADMIN</span>
-                <button id="btnLogout" class="bg-[#0f172a] hover:bg-red-500/20 hover:text-red-400 px-5 py-2 rounded-xl border border-slate-700 transition-all font-bold text-sm">
-                    <i class="fas fa-power-off mr-2"></i>SAIR
+            <div id="userInfo" class="user-info hidden">
+                <span class="admin-tag">ADMIN</span>
+                <button id="btnLogout" class="btn-logout">
+                    <i class="fas fa-power-off"></i> SAIR
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-12">
+    <main class="container py-12">
         
-        <section id="loginSection" class="max-w-lg mx-auto bg-[#1e293b] p-12 rounded-3xl shadow-2xl border-2 border-slate-700 shadow-blue-500/10 mt-12 flex flex-col items-center">
-            <div class="text-center mb-12 flex flex-col items-center">
-                <h2 class="text-3xl font-black text-white flex gap-2">ACESSO <span class="text-blue-500">RESTRITO</span></h2>
-                <p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-2 border-t-2 border-blue-500/30 pt-2 w-full text-center">IDENTIFIQUE-SE PARA GERENCIAR ATLETAS</p>
+        <section id="loginSection" class="login-card">
+            <div class="card-header">
+                <h2 class="title-lg">ACESSO <span class="neon-blue">RESTRITO</span></h2>
+                <p class="subtitle">IDENTIFIQUE-SE PARA GERENCIAR ATLETAS</p>
             </div>
-            <form id="loginForm" class="space-y-6 w-full max-w-sm">
-                <div>
-                    <input type="text" id="usuario" required placeholder="USUÁRIO" class="w-full bg-[#0f172a] border border-slate-700 rounded-2xl px-5 py-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-white placeholder-slate-600 font-bold uppercase text-xs">
-                </div>
-                <div>
-                    <input type="password" id="password" required placeholder="SENHA" class="w-full bg-[#0f172a] border border-slate-700 rounded-2xl px-5 py-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-white placeholder-slate-600 font-bold uppercase text-xs">
-                </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-[#1e293b] font-black py-5 rounded-2xl shadow-lg shadow-blue-600/30 transition-all transform active:scale-95 uppercase text-sm tracking-widest">
-                    ENTRAR NO SISTEMA
-                </button>
-                <p id="loginError" class="hidden text-red-400 text-center text-xs font-bold bg-red-400/10 py-3 rounded-2xl border border-red-400/20">Usuário ou senha incorretos!</p>
+            <form id="loginForm" class="form-stack">
+                <input type="text" id="usuario" required placeholder="USUÁRIO" class="input-dark">
+                <input type="password" id="password" required placeholder="SENHA" class="input-dark">
+                <button type="submit" class="btn-neon">ENTRAR NO SISTEMA</button>
+                <p id="loginError" class="error-msg hidden">Usuário ou senha incorretos!</p>
             </form>
         </section>
 
-        <section id="adminSection" class="hidden space-y-10">
-            <div class="flex flex-col lg:flex-row gap-10">
-                
-                <div class="w-full lg:w-1/3">
-                    <div class="bg-[#1e293b] p-10 rounded-3xl border border-slate-700 shadow-xl shadow-blue-500/5 sticky top-12">
-                        <h3 id="formTitle" class="text-xl font-black mb-10 flex items-center gap-4 text-white">
-                            <i class="fas fa-plus text-blue-500"></i> NOVO CADASTRO
-                        </h3>
-                        <form id="alunoForm" class="space-y-6">
-                            <input type="hidden" id="alunoId">
-                            <div>
-                                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Nome Completo</label>
-                                <input type="text" id="nome" required placeholder="Ex: João da Silva" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl py-4 px-5 focus:border-blue-500 outline-none transition-colors text-white font-medium text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Documento (CPF)</label>
-                                <input type="text" id="cpf" required placeholder="000.000.000-00" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl py-4 px-5 focus:border-blue-500 outline-none transition-colors text-white font-mono text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Situação Atual</label>
-                                <div class="relative">
-                                    <select id="status" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl py-4 px-5 focus:border-blue-500 outline-none transition-colors appearance-none cursor-pointer text-white font-bold text-sm">
-                                        <option value="Ativo" class="text-blue-400 font-bold bg-[#1e293b]">Ativo</option>
-                                        <option value="Inativo" class="text-red-400 font-bold bg-[#1e293b]">Inativo</option>
-                                        <option value="Pendente" class="text-yellow-400 font-bold bg-[#1e293b]">Pendente</option>
-                                    </select>
-                                    <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
-                                </div>
-                            </div>
-                            <div class="flex gap-4 pt-6">
-                                <button type="submit" class="flex-1 bg-blue-500 text-[#1e293b] font-black py-4 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-600/20 uppercase text-xs tracking-widest">
-                                    SALVAR
-                                </button>
-                                <button type="button" id="btnCancelar" class="hidden flex-1 bg-slate-700 text-slate-200 font-black py-4 rounded-xl hover:bg-slate-600 transition-all uppercase text-xs tracking-widest">
-                                    CANCELAR
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="w-full lg:w-2/3">
-                    <div class="bg-[#1e293b] rounded-3xl border border-slate-700 shadow-xl shadow-blue-500/5 overflow-hidden">
-                        <div class="p-8 border-b border-slate-700 flex justify-between items-center bg-[#1e293b]">
-                            <div>
-                                <h3 class="font-black text-xl text-white">LISTAGEM PRO</h3>
-                                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Total: <span id="totalAlunos" class="text-blue-400 font-bold">0</span> registros cadastrados</p>
-                            </div>
-                            <button onclick="carregarAlunos()" class="p-3 bg-[#0f172a] rounded-xl text-blue-500 hover:text-white transition-colors border border-blue-500">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
+        <section id="adminSection" class="admin-grid hidden">
+            
+            <div class="form-column">
+                <div class="card p-10 sticky">
+                    <h3 id="formTitle" class="form-title">
+                        <i class="fas fa-plus neon-blue"></i> NOVO CADASTRO
+                    </h3>
+                    <form id="alunoForm" class="form-stack">
+                        <input type="hidden" id="alunoId">
+                        
+                        <div class="field">
+                            <label class="label">Nome Completo</label>
+                            <input type="text" id="nome" required placeholder="Ex: João da Silva" class="input-dark">
                         </div>
-                        <div class="overflow-x-auto scrollbar-thin">
-                            <table class="w-full text-left">
-                                <thead class="bg-[#0f172a] text-slate-500 text-[10px] uppercase font-black tracking-widest border-b-2 border-slate-800">
-                                    <tr>
-                                        <th class="px-8 py-5">Dados do Atleta</th>
-                                        <th class="px-8 py-5">CPF</th>
-                                        <th class="px-8 py-5">Situação</th>
-                                        <th class="px-8 py-5 text-right">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaAlunos" class="divide-y divide-slate-800 text-sm">
-                                    </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
 
+                        <div class="field">
+                            <label class="label">Documento (CPF)</label>
+                            <input type="text" id="cpf" required placeholder="000.000.000-00" class="input-dark font-mono">
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Situação Atual</label>
+                            <div class="select-wrapper">
+                                <select id="status" class="input-dark select-field">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Inativo">Inativo</option>
+                                    <option value="Pendente">Pendente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn-neon flex-1">SALVAR</button>
+                            <button type="button" id="btnCancelar" class="btn-cancel hidden flex-1">CANCELAR</button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
+            <div class="table-column">
+                <div class="card overflow-hidden">
+                    <div class="table-header">
+                        <div>
+                            <h3 class="title-md">LISTAGEM PRO</h3>
+                            <p class="subtitle">Total: <span id="totalAlunos" class="neon-blue">0</span> registros</p>
+                        </div>
+                        <button onclick="carregarAlunos()" class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Dados do Atleta</th>
+                                    <th>CPF</th>
+                                    <th>Situação</th>
+                                    <th class="text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAlunos">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </section>
     </main>
 
