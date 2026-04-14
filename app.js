@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://api-academia-npw8skh2a-pedro-mrs15s-projects.vercel.app'; 
+const API_BASE_URL = 'https://api-academia-five.vercel.app/'; 
 
 const loginSection = document.getElementById('loginSection');
 const adminSection = document.getElementById('adminSection');
