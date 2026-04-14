@@ -3,130 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.A.A. - Sistema Academia</title>
+    <title>Painel Academia - Gestão de Alunos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0a0a0a',
-                        darkCard: '#141414',
-                        palmeirasGreen: '#00FF41',
-                        darkBorder: '#262626',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .neon-border { border: 1px solid #262626; transition: all 0.3s ease; }
-        .neon-border:focus-within { border-color: #00FF41; box-shadow: 0 0 15px rgba(0, 255, 65, 0.1); }
-        .glass { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px); }
-    </style>
 </head>
-<body class="bg-darkBg text-gray-300 min-h-screen font-sans">
+<body class="bg-gray-50 min-h-screen text-gray-800">
 
-    <nav class="border-b border-darkBorder sticky top-0 z-50 glass">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-palmeirasGreen rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(0,255,65,0.3)]">
-                    <i class="fas fa-dumbbell text-black text-xl"></i>
+    <nav class="bg-red-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-dumbbell text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-wider">Academia PowerUp</span>
                 </div>
-                <h1 class="text-xl font-black uppercase text-white tracking-tighter">Academia <span class="text-palmeirasGreen">Pro</span></h1>
-            </div>
-            <div id="userInfo" class="hidden">
-                <button id="btnLogout" class="text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">
-                    <i class="fas fa-power-off mr-2 text-red-500"></i>Sair
-                </button>
+                <div id="userInfo" class="hidden flex items-center gap-4">
+                    <span id="userEmail" class="text-sm font-medium">Admin</span>
+                    <button id="btnLogout" class="bg-white text-red-600 hover:bg-gray-100 px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-6 max-w-7xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        <section id="loginSection" class="max-w-md mx-auto mt-20">
-            <div class="bg-darkCard border border-darkBorder rounded-2xl p-8 shadow-2xl">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-black text-white uppercase tracking-widest">Acesso <span class="text-palmeirasGreen">Restrito</span></h2>
-                    <p class="text-[10px] text-gray-500 mt-2 font-mono uppercase">Identifique-se para gerenciar atletas</p>
-                </div>
-                <form id="loginForm" class="space-y-6">
-                    <div class="neon-border rounded-xl p-3 bg-darkBg">
-                        <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Usuário</label>
-                        <input type="text" id="usuario" required class="w-full bg-transparent text-white outline-none text-sm">
-                    </div>
-                    <div class="neon-border rounded-xl p-3 bg-darkBg">
-                        <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Senha</label>
-                        <input type="password" id="password" required class="w-full bg-transparent text-white outline-none text-sm">
-                    </div>
-                    <button type="submit" class="w-full bg-palmeirasGreen hover:bg-white text-black font-black py-4 rounded-xl transition-all uppercase text-xs tracking-[0.2em] shadow-lg shadow-palmeirasGreen/10">
-                        Entrar no Sistema
-                    </button>
-                    <div id="loginError" class="hidden text-red-500 text-[10px] text-center font-bold uppercase tracking-tighter">Credenciais Inválidas</div>
-                </form>
+        <div id="loginSection" class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 mt-10">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">Acesso Restrito</h2>
+                <p class="text-sm text-gray-500 mt-2">Área administrativa da Academia</p>
             </div>
-        </section>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Usuário</label>
+                    <input type="text" id="usuario" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" id="password" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition duration-200">
+                    Entrar
+                </button>
+                <div id="loginError" class="hidden text-red-500 text-sm text-center mt-2">Credenciais inválidas!</div>
+            </form>
+        </div>
 
-        <section id="adminSection" class="hidden space-y-8">
+        <div id="adminSection" class="hidden space-y-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Total de Alunos</p>
+                        <p id="totalAlunos" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex flex-col lg:flex-row gap-8">
                 
                 <div class="w-full lg:w-1/3">
-                    <div class="bg-darkCard border border-darkBorder rounded-2xl p-6 sticky top-24">
-                        <h3 id="formTitle" class="text-sm font-black text-white uppercase tracking-widest mb-6 border-b border-darkBorder pb-4">Novo Cadastro</h3>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 sticky top-6">
+                        <h3 id="formTitle" class="text-lg font-bold text-gray-800 mb-6 border-b pb-2">Cadastrar Aluno</h3>
+                        
                         <form id="alunoForm" class="space-y-4">
                             <input type="hidden" id="alunoId">
-                            <div class="neon-border rounded-xl p-3 bg-darkBg">
-                                <label class="text-[10px] uppercase font-bold text-gray-500">Nome do Atleta</label>
-                                <input type="text" id="nome" required class="w-full bg-transparent text-white outline-none text-sm mt-1">
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                                <input type="text" id="nome" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-red-500 focus:border-red-500">
                             </div>
-                            <div class="neon-border rounded-xl p-3 bg-darkBg">
-                                <label class="text-[10px] uppercase font-bold text-gray-500">Documento (CPF)</label>
-                                <input type="text" id="cpf" required class="w-full bg-transparent text-white outline-none text-sm mt-1">
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">CPF</label>
+                                <input type="text" id="cpf" required placeholder="000.000.000-00" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-red-500 focus:border-red-500">
                             </div>
-                            <div class="neon-border rounded-xl p-3 bg-darkBg">
-                                <label class="text-[10px] uppercase font-bold text-gray-500">Status de Acesso</label>
-                                <select id="status" class="w-full bg-transparent text-white outline-none text-sm mt-1 cursor-pointer">
-                                    <option value="ATIVO" class="bg-darkCard">ATIVO</option>
-                                    <option value="BLOQUEADO" class="bg-darkCard">BLOQUEADO</option>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Status da Matrícula</label>
+                                <select id="status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-red-500 focus:border-red-500">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Inativo">Inativo</option>
+                                    <option value="Pendente">Pendente</option>
                                 </select>
                             </div>
-                            <div class="flex gap-3 pt-4">
-                                <button type="submit" class="flex-1 bg-palmeirasGreen hover:bg-white text-black font-black py-3 rounded-xl transition-all uppercase text-[10px]">Salvar</button>
-                                <button type="button" id="btnCancelar" class="hidden flex-1 border border-darkBorder hover:bg-white/5 text-white font-black py-3 rounded-xl transition-all uppercase text-[10px]">Cancelar</button>
+
+                            <div class="flex gap-3 pt-2">
+                                <button type="submit" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-md shadow-sm text-sm font-medium hover:bg-red-700 transition duration-200">
+                                    Salvar
+                                </button>
+                                <button type="button" id="btnCancelar" class="hidden flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm text-sm font-medium hover:bg-gray-300 transition duration-200">
+                                    Cancelar
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <div class="w-full lg:w-2/3">
-                    <div class="bg-darkCard border border-darkBorder rounded-2xl overflow-hidden">
-                        <div class="p-6 border-b border-darkBorder flex justify-between items-center bg-white/5">
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest">Base de Dados</h3>
-                            <button onclick="carregarAlunos()" class="text-palmeirasGreen hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">
-                                <i class="fas fa-sync-alt mr-2"></i>Atualizar
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 class="text-lg font-bold text-gray-800">Gerenciar Alunos</h3>
+                            <button onclick="carregarAlunos()" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                <i class="fas fa-sync-alt mr-1"></i> Atualizar
                             </button>
                         </div>
+                        
                         <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead class="bg-darkBg/50 border-b border-darkBorder text-[10px] uppercase font-bold text-gray-500">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-4 text-left">Atleta</th>
-                                        <th class="px-6 py-4 text-left">Status</th>
-                                        <th class="px-6 py-4 text-right">Ações</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CPF</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabelaAlunos" class="divide-y divide-darkBorder"></tbody>
+                                <tbody id="tabelaAlunos" class="bg-white divide-y divide-gray-200">
+                                    </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

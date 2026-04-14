@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://api-academia-five.vercel.app/'; 
+const API_BASE_URL = 'https://api-academia-five.vercel.app'; 
 
 const loginSection = document.getElementById('loginSection');
 const adminSection = document.getElementById('adminSection');
@@ -9,10 +9,11 @@ const loginError = document.getElementById('loginError');
 
 const alunoForm = document.getElementById('alunoForm');
 const tabelaAlunos = document.getElementById('tabelaAlunos');
+const totalAlunosEl = document.getElementById('totalAlunos');
 const btnCancelar = document.getElementById('btnCancelar');
 const formTitle = document.getElementById('formTitle');
 
-let tokenAtual = localStorage.getItem('adminToken') || null;
+let tokenAtual = localStorage.getItem('gymToken') || null;
 let alunos = [];
 
 function iniciarApp() {
@@ -24,9 +25,9 @@ function iniciarApp() {
     }
 }
 
-// LOGIN (Baseado no modelo de Charadas)
+// 1. AUTENTICAÇÃO
 loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     const usuario = document.getElementById('usuario').value;
     const password = document.getElementById('password').value;
 
@@ -34,34 +35,36 @@ loginForm.addEventListener('submit', async (e) => {
         const resposta = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario: usuario, senha: password })
+            body: JSON.stringify({ usuario: usuario, senha: password }) 
         });
 
         if (resposta.ok) {
-            const dados = await resposta.json();
+            const dados = await resposta.json(); 
             tokenAtual = dados.token;
-            localStorage.setItem('adminToken', tokenAtual);
-            loginForm.reset();
+            localStorage.setItem('gymToken', tokenAtual); 
+            
+            loginForm.reset(); 
             mostrarPainelAdmin();
-            carregarAlunos();
+            carregarAlunos(); 
         } else {
             loginError.classList.remove('hidden');
         }
     } catch (erro) {
-        alert("Erro ao conectar com a API.");
+        alert("Erro ao conectar com o servidor.");
     }
 });
 
 btnLogout.addEventListener('click', () => {
-    localStorage.removeItem('adminToken');
     tokenAtual = null;
-    mostrarLogin();
+    localStorage.removeItem('gymToken');
+    mostrarLogin(); 
 });
 
-// LISTAR (READ)
+// 2. READ (Listar Alunos)
 async function carregarAlunos() {
     try {
         const resposta = await fetch(`${API_BASE_URL}/alunos`, {
+            method: 'GET',
             headers: { 'Authorization': `Bearer ${tokenAtual}` }
         });
 
@@ -71,99 +74,102 @@ async function carregarAlunos() {
         }
 
         if (resposta.ok) {
-            alunos = await resposta.json();
-            renderizarTabela();
+            alunos = await resposta.json(); 
+            renderizarTabela(); 
         }
-    } catch (erro) { console.error(erro); }
+    } catch (erro) {
+        console.error("Erro:", erro);
+    }
 }
 
 function renderizarTabela() {
-    tabelaAlunos.innerHTML = '';
+    tabelaAlunos.innerHTML = ''; 
+    totalAlunosEl.textContent = alunos.length;
+
     alunos.forEach(aluno => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-white/5 transition-colors group";
         tr.innerHTML = `
-            <td class="px-6 py-4">
-                <div class="text-sm font-bold text-white uppercase">${aluno.nome}</div>
-                <div class="text-[10px] text-gray-500 font-mono tracking-tighter">${aluno.cpf}</div>
-            </td>
-            <td class="px-6 py-4">
-                <span class="text-[9px] font-black px-2 py-1 rounded-md border ${aluno.status === 'ATIVO' ? 'border-palmeirasGreen text-palmeirasGreen bg-palmeirasGreen/5' : 'border-red-500 text-red-500 bg-red-500/5'}">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">${aluno.nome}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${aluno.cpf}</td>
+            <td class="px-6 py-4 text-sm">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold ${aluno.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                     ${aluno.status}
                 </span>
             </td>
-            <td class="px-6 py-4 text-right">
-                <button onclick="editarAluno(${aluno.id})" class="text-gray-500 hover:text-palmeirasGreen mr-3 transition-colors">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deletarAluno(${aluno.id})" class="text-gray-500 hover:text-red-500 transition-colors">
-                    <i class="fas fa-trash"></i>
-                </button>
+            <td class="px-6 py-4 text-right text-sm font-medium">
+                <button onclick="editarAluno('${aluno.id}')" class="text-red-600 hover:text-red-900 mr-3">Editar</button>
+                <button onclick="deletarAluno('${aluno.id}')" class="text-gray-400 hover:text-red-600">Excluir</button>
             </td>
         `;
         tabelaAlunos.appendChild(tr);
     });
 }
 
-// SALVAR (POST / PATCH)
+// 3. CREATE / UPDATE
 alunoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const id = document.getElementById('alunoId').value;
-    const alunoData = {
-        nome: document.getElementById('nome').value,
-        cpf: document.getElementById('cpf').value,
-        status: document.getElementById('status').value
-    };
+    const nome = document.getElementById('nome').value;
+    const cpf = document.getElementById('cpf').value;
+    const status = document.getElementById('status').value;
+
+    const alunoData = { nome, cpf, status };
 
     try {
-        const url = id ? `${API_BASE_URL}/alunos/${id}` : `${API_BASE_URL}/alunos`;
-        const metodo = id ? 'PATCH' : 'POST';
+        let url = `${API_BASE_URL}/alunos`;
+        let metodo = 'POST'; 
+
+        if (id) {
+            url = `${API_BASE_URL}/alunos/${id}`;
+            metodo = 'PUT'; 
+        }
 
         const resposta = await fetch(url, {
             method: metodo,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenAtual}`
+                'Authorization': `Bearer ${tokenAtual}` 
             },
             body: JSON.stringify(alunoData)
         });
 
         if (resposta.ok) {
             limparFormulario();
-            carregarAlunos();
-        } else {
-            const erro = await resposta.json();
-            alert(erro.error);
+            carregarAlunos(); 
         }
-    } catch (e) { alert("Erro de rede."); }
+    } catch (erro) {
+        console.error("Erro:", erro);
+    }
 });
 
 function editarAluno(id) {
-    const aluno = alunos.find(a => a.id == id);
+    const aluno = alunos.find(a => String(a.id) === String(id)); 
     if (aluno) {
         document.getElementById('alunoId').value = aluno.id;
         document.getElementById('nome').value = aluno.nome;
         document.getElementById('cpf').value = aluno.cpf;
         document.getElementById('status').value = aluno.status;
-        formTitle.textContent = "Editar Cadastro";
+
+        formTitle.textContent = "Editar Aluno";
         btnCancelar.classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
-async function deletarAluno(id) {
-    if (!confirm("Excluir este atleta permanentemente?")) return;
-    const resposta = await fetch(`${API_BASE_URL}/alunos/${id}`, {
+function deletarAluno(id) {
+    if (!confirm("Excluir cadastro do aluno?")) return;
+    fetch(`${API_BASE_URL}/alunos/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${tokenAtual}` }
-    });
-    if (resposta.ok) carregarAlunos();
+    }).then(res => { if(res.ok) carregarAlunos(); });
 }
+
+btnCancelar.addEventListener('click', limparFormulario);
 
 function limparFormulario() {
     alunoForm.reset();
     document.getElementById('alunoId').value = '';
-    formTitle.textContent = "Novo Cadastro";
+    formTitle.textContent = "Cadastrar Aluno";
     btnCancelar.classList.add('hidden');
 }
 
