@@ -3,110 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerGym Admin - Blue Neon Pro</title>
+    <title>BlackIron Gym - Painel</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="container nav-content">
-            <div class="logo-area">
-                <div class="logo-box">
-                    <i class="fas fa-dumbbell"></i>
-                </div>
-                <span class="logo-text">BLACK<span class="neon-blue">IRON</span> GYM</span>
-            </div>
-            <div id="userInfo" class="user-info hidden">
-                <span class="admin-tag">ADMIN</span>
-                <button id="btnLogout" class="btn-logout">
-                    <i class="fas fa-power-off"></i> SAIR
-                </button>
-            </div>
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">B</span>
+            <span class="logo-text">BLACKIRON GYM</span>
         </div>
-    </nav>
+        <div id="userInfo" class="user-info hidden">
+            <span class="admin-label">ADMIN</span>
+            <button id="btnLogout" class="btn-exit">SAIR</button>
+        </div>
+    </header>
 
-    <main class="container py-12">
+    <main class="content-wrapper">
         
-        <section id="loginSection" class="login-card">
-            <div class="card-header">
-                <h2 class="title-lg">ACESSO <span class="neon-blue">RESTRITO</span></h2>
-                <p class="subtitle">IDENTIFIQUE-SE PARA GERENCIAR ATLETAS</p>
+        <section id="loginSection" class="login-container">
+            <div class="login-card">
+                <div class="card-header">
+                    <h2>ACESSO <span class="highlight">RESTRITO</span></h2>
+                    <p>IDENTIFIQUE-SE PARA GERENCIAR ATLETAS</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input type="text" id="usuario" required placeholder="USUÁRIO">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="password" required placeholder="SENHA">
+                    </div>
+                    <button type="submit" class="btn-primary">ENTRAR NO SISTEMA</button>
+                    <p id="loginError" class="hidden error-msg">Usuário ou senha incorretos!</p>
+                </form>
             </div>
-            <form id="loginForm" class="form-stack">
-                <input type="text" id="usuario" required placeholder="USUÁRIO" class="input-dark">
-                <input type="password" id="password" required placeholder="SENHA" class="input-dark">
-                <button type="submit" class="btn-neon">ENTRAR NO SISTEMA</button>
-                <p id="loginError" class="error-msg hidden">Usuário ou senha incorretos!</p>
-            </form>
         </section>
 
         <section id="adminSection" class="admin-grid hidden">
             
-            <div class="form-column">
-                <div class="card p-10 sticky">
-                    <h3 id="formTitle" class="form-title">
-                        <i class="fas fa-plus neon-blue"></i> NOVO CADASTRO
-                    </h3>
-                    <form id="alunoForm" class="form-stack">
-                        <input type="hidden" id="alunoId">
-                        
-                        <div class="field">
-                            <label class="label">Nome Completo</label>
-                            <input type="text" id="nome" required placeholder="Ex: João da Silva" class="input-dark">
-                        </div>
-
-                        <div class="field">
-                            <label class="label">Documento (CPF)</label>
-                            <input type="text" id="cpf" required placeholder="000.000.000-00" class="input-dark font-mono">
-                        </div>
-
-                        <div class="field">
-                            <label class="label">Situação Atual</label>
-                            <div class="select-wrapper">
-                                <select id="status" class="input-dark select-field">
-                                    <option value="Ativo">Ativo</option>
-                                    <option value="Inativo">Inativo</option>
-                                    <option value="Pendente">Pendente</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="btn-group">
-                            <button type="submit" class="btn-neon flex-1">SALVAR</button>
-                            <button type="button" id="btnCancelar" class="btn-cancel hidden flex-1">CANCELAR</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="table-column">
-                <div class="card overflow-hidden">
-                    <div class="table-header">
-                        <div>
-                            <h3 class="title-md">LISTAGEM PRO</h3>
-                            <p class="subtitle">Total: <span id="totalAlunos" class="neon-blue">0</span> registros</p>
-                        </div>
-                        <button onclick="carregarAlunos()" class="btn-refresh">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+            <aside class="form-container">
+                <h3 id="formTitle">+ NOVO CADASTRO</h3>
+                <form id="alunoForm">
+                    <input type="hidden" id="alunoId">
+                    
+                    <div class="field">
+                        <label>NOME COMPLETO</label>
+                        <input type="text" id="nome" required placeholder="Ex: João da Silva">
                     </div>
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Dados do Atleta</th>
-                                    <th>CPF</th>
-                                    <th>Situação</th>
-                                    <th class="text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaAlunos">
-                                </tbody>
-                        </table>
+
+                    <div class="field">
+                        <label>DOCUMENTO (CPF)</label>
+                        <input type="text" id="cpf" required placeholder="000.000.000-00">
                     </div>
+
+                    <div class="field">
+                        <label>SITUAÇÃO ATUAL</label>
+                        <select id="status">
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">SALVAR</button>
+                        <button type="button" id="btnCancelar" class="hidden btn-cancel">CANCELAR</button>
+                    </div>
+                </form>
+            </aside>
+
+            <article class="table-container">
+                <div class="table-header">
+                    <div>
+                        <h3>LISTAGEM PRO</h3>
+                        <p>Total: <span id="totalAlunos">0</span> registros</p>
+                    </div>
+                    <button onclick="carregarAlunos()" class="btn-refresh">⟳</button>
                 </div>
-            </div>
+                <div class="table-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>DADOS DO ATLETA</th>
+                                <th>CPF</th>
+                                <th>SITUAÇÃO</th>
+                                <th>AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAlunos">
+                            </tbody>
+                    </table>
+                </div>
+            </article>
 
         </section>
     </main>
