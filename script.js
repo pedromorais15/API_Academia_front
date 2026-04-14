@@ -48,10 +48,10 @@ loginForm.addEventListener('submit', async (e) => {
             carregarAlunos();
         } else {
             loginError.classList.remove('hidden');
-            setTimeout(() => loginError.classList.add('hidden'), 3000);
+            setTimeout(() => loginError.classList.add('hidden'), 4000);
         }
     } catch (erro) {
-        alert("Erro de conexão com o servidor.");
+        alert("Erro de conexão com a API.");
     }
 });
 
@@ -78,31 +78,37 @@ function renderizarTabela() {
     tabelaAlunos.innerHTML = '';
     totalAlunosEl.textContent = alunos.length;
 
+    // Ordenar alunos por ID de forma decrescente para os novos aparecerem em cima
+    alunos.sort((a, b) => b.id - a.id);
+
     alunos.forEach(aluno => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition-colors border-l-2 border-transparent hover:border-blue-500";
+        // Efeito de hover com borda Neon Blue
+        tr.className = "hover:bg-slate-800/60 transition-colors border-l-4 border-transparent hover:border-blue-500 cursor-default";
         
-        // Estilo dinâmico para os status
+        // Estilo dinâmico para os status no Dark Mode
         let statusClass = "bg-slate-700 text-slate-300";
-        if(aluno.status === 'Ativo') statusClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+        // Estilo Neon Blue suave para "Ativo"
+        if(aluno.status === 'Ativo') statusClass = "bg-blue-500/15 text-blue-400 border border-blue-500/30 font-bold";
         if(aluno.status === 'Inativo') statusClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+        if(aluno.status === 'Pendente') statusClass = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
 
         tr.innerHTML = `
-            <td class="px-6 py-4">
-                <div class="font-bold text-white">${aluno.nome}</div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-tighter">Matrícula: #${aluno.id}</div>
+            <td class="px-8 py-5">
+                <div class="font-black text-white text-base">${aluno.nome}</div>
+                <div class="text-[11px] text-blue-400 uppercase font-black tracking-widest mt-0.5">Atleta PRO ID: #${aluno.id}</div>
             </td>
-            <td class="px-6 py-4 text-slate-400 font-mono">${aluno.cpf}</td>
-            <td class="px-6 py-4">
-                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${statusClass}">
+            <td class="px-8 py-5 text-slate-400 font-mono text-sm">${aluno.cpf}</td>
+            <td class="px-8 py-5">
+                <span class="px-4 py-1.5 rounded-full text-xs uppercase font-black ${statusClass}">
                     ${aluno.status}
                 </span>
             </td>
-            <td class="px-6 py-4 text-right">
-                <button onclick="prepararEdicao('${aluno.id}')" class="p-2 text-slate-400 hover:text-blue-400 transition-colors">
+            <td class="px-8 py-5 text-right">
+                <button onclick="prepararEdicao('${aluno.id}')" class="p-3 text-slate-400 hover:text-blue-500 transition-colors bg-[#0f172a] rounded-lg border border-slate-700 hover:border-blue-500 ml-3">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button onclick="deletarAluno('${aluno.id}')" class="p-2 text-slate-400 hover:text-red-400 transition-colors ml-2">
+                <button onclick="deletarAluno('${aluno.id}')" class="p-3 text-slate-400 hover:text-red-400 transition-colors ml-2 bg-[#0f172a] rounded-lg border border-slate-700 hover:border-red-400">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -137,9 +143,10 @@ alunoForm.addEventListener('submit', async (e) => {
         if (resposta.ok) {
             limparFormulario();
             carregarAlunos();
+            if(id) alert("Cadastro do Atleta PRO atualizado com sucesso!");
         } else {
             const erro = await resposta.json();
-            alert("Erro: " + erro.error);
+            alert("Falha ao salvar: " + erro.error);
         }
     } catch (err) {
         console.error(err);
@@ -153,27 +160,27 @@ function prepararEdicao(id) {
         document.getElementById('nome').value = aluno.nome;
         document.getElementById('cpf').value = aluno.cpf;
         document.getElementById('status').value = aluno.status;
-        formTitle.innerHTML = `<span class="w-2 h-8 bg-yellow-500 rounded-full"></span> EDITAR ALUNO`;
+        formTitle.innerHTML = `<i class="fas fa-edit text-blue-500"></i> ATUALIZAR CADASTRO`;
         btnCancelar.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
 async function deletarAluno(id) {
-    if (!confirm("Confirmar exclusão definitiva?")) return;
+    if (!confirm("Confirmar exclusão definitiva do cadastro deste Atleta PRO?")) return;
     try {
         const res = await fetch(`${API_BASE_URL}/alunos/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${tokenAtual}` }
         });
         if (res.ok) carregarAlunos();
-    } catch (err) { alert("Erro ao deletar"); }
+    } catch (err) { alert("Erro de conexão ao tentar deletar"); }
 }
 
 function limparFormulario() {
     alunoForm.reset();
     document.getElementById('alunoId').value = '';
-    formTitle.innerHTML = `<span class="w-2 h-8 bg-blue-500 rounded-full"></span> NOVO CADASTRO`;
+    formTitle.innerHTML = `<i class="fas fa-plus text-blue-500"></i> NOVO CADASTRO`;
     btnCancelar.classList.add('hidden');
 }
 
