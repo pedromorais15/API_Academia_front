@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.A. - Sistema Academia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0a0a0a',
+                        darkCard: '#141414',
+                        palmeirasGreen: '#00FF41',
+                        darkBorder: '#262626',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-gray-300 min-h-screen font-sans">
+
+    <header class="border-b border-darkBorder sticky top-0 z-50 bg-darkCard/80 backdrop-blur-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-palmeirasGreen rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h1 class="text-xl font-black uppercase text-white">Academia <span class="text-palmeirasGreen">Pro</span></h1>
+            </div>
+            <div id="auth-status" class="text-[10px] font-mono px-3 py-1 rounded-full border border-darkBorder text-gray-500">
+                VERIFICANDO ACESSO...
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 max-w-5xl">
+        <section class="mb-10">
+            <div class="bg-darkCard border border-darkBorder rounded-2xl p-8 shadow-2xl">
+                <form id="form-aluno" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <input type="hidden" id="aluno-id">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs uppercase font-bold text-gray-500 mb-2">Nome do Atleta</label>
+                        <input type="text" id="nome" placeholder="Nome Completo" class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-white outline-none focus:border-palmeirasGreen transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-gray-500 mb-2">Documento (CPF)</label>
+                        <input type="text" id="cpf" placeholder="Apenas números" class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-white outline-none focus:border-palmeirasGreen transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-gray-500 mb-2">Status</label>
+                        <select id="status" class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-white outline-none cursor-pointer">
+                            <option value="ATIVO">ATIVO</option>
+                            <option value="BLOQUEADO">BLOQUEADO</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="btn-salvar" class="md:col-span-4 bg-palmeirasGreen hover:bg-white text-black font-black py-4 rounded-xl transition-all uppercase tracking-widest shadow-lg shadow-palmeirasGreen/10">
+                        Confirmar Cadastro
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section>
+            <div class="grid grid-cols-1 gap-4" id="lista-container">
+                </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
